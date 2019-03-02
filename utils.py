@@ -77,13 +77,11 @@ def find_waste_index(items: List[dict], waste_type: str):
     return -1
 
 
-def dump(bkend: IBackend, inst: instance.Instance):
+def dump(inst: instance.Instance):
     """
     dump waste in the appropriate bin
 
-    :param bkend:
     :param inst:
-    :param current_location:
     :return:
     """
     organic_bin_loc = inst.bin_location_organic
@@ -108,7 +106,8 @@ def dump(bkend: IBackend, inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            bkend.unload_item(items_held[waste_index]['id'])
+            inst.unload(items_held[waste_index]['id'])
+            bkend.unload_item()
             items_held.pop(waste_index)
             dumped_organic += 1
 

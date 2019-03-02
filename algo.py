@@ -6,7 +6,7 @@ import instance
 
 def algo(inst: instance.Instance):
     # get points
-    points: utils.Points = []
+    points: utils.Points = utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)
 
     for point in points:
         inst.move_to_point(point)
