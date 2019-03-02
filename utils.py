@@ -81,9 +81,9 @@ def dump(bkend: IBackend, inst: instance.Instance):
     """
     dump waste in the appropriate bin
 
-    :param bkend:
-    :param inst:
-    :param current_location:
+    :param bkend: instance of the backend
+    :param inst: instance of the current state
+    :param current_location: tuple with coordinates for current location
     :return:
     """
     organic_bin_loc = inst.bin_location_organic
@@ -179,8 +179,7 @@ def get_scan_path(size_x: int, size_y: int, scan_w):
     while True:
 
         # if we're out of bounds already, go down our scan width +1 and our scan width over to the right.
-        if curr_x >= size_x or curr_x < 0 \
-                or curr_y >= size_y or curr_y < 0:
+        if curr_x >= size_x or curr_x < 0 or curr_y >= size_y or curr_y < 0:
 
             if curr_x >= (size_x - scan_w) and (curr_y >= size_y - scan_w):
                 break
