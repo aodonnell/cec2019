@@ -14,6 +14,7 @@ class Instance:
     y_min: int
     y_max: int
     radius: int
+    direction: str
     time_turn: int
     time_move: int
     time_scan: int
@@ -79,16 +80,29 @@ class Instance:
         y_change = target[1] - self.current_point[1]
 
         if x_change > 0:
-            self.back.turn('E')
+            self.turn('E')
         elif x_change < 0:
-            self.back.turn('W')
+            self.turn('W')
         move_steps(abs(x_change))
 
         if y_change > 0:
-            self.back.turn('N')
+            self.turn('N')
         elif y_change < 0:
-            self.back.turn('S')
+            self.turn('S')
         move_steps(abs(y_change))
+
+    def turn(self, direction: str):
+        if self.direction == direction:
+            return
+
+        self.back.turn(direction)
+        self.direction = direction
+        self.time_spent += self.time_turn
+
+    def unload(self, i: int):
+        item = self.items_held[i]
+        self.back.unload_item(item['id'])
+        self.time_spent += self.time_unload
 
     @classmethod
     def from_backend(cls, back: backend.IBackend):
@@ -107,6 +121,7 @@ class Instance:
             dimensions['Y_MIN'],
             dimensions['Y_MAX'],
             constants['SCAN_RADIUS'],
+            payload['direction'],
             time['TURN'],
             time['MOVE'],
             time['SCAN_AREA'],
