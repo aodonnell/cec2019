@@ -65,14 +65,12 @@ def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location
 
     if x_change > 0:
         bkend.turn('E')
-        move_steps(bkend, abs(x_change))
     elif x_change < 0:
         bkend.turn('W')
-        move_steps(bkend, abs(x_change))
+    move_steps(bkend, abs(x_change))
 
     if y_change > 0:
         bkend.turn('N')
-        move_steps(bkend, abs(x_change))
     elif y_change < 0:
         bkend.turn('S')
-        move_steps(bkend, abs(y_change))
+    move_steps(bkend, abs(y_change))
