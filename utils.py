@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import instance
 from backend import IBackend
@@ -51,11 +51,33 @@ def manhattan_distance(p1: Point, p2: Point):
     return abs(p2[0] - p1[0]) + abs(p2[1] - p1[1])
 
 
+def closest_point(points: List[Point], target: Point) -> Optional[Point]:
+    closest: Tuple[int, Point] = None
+
+    for around in points:
+        distance = manhattan_distance(around, target)
+        if closest and distance >= closest[0]:
+            continue
+
+        closest = (distance, around)
+
+    if closest is None:
+        return None
+
+    return closest[1]
+
+
+'''
+    Move the bot multiple steps
+'''
 def move_steps(bkend: IBackend, num_of_steps: int):
     for _ in range(num_of_steps):
         bkend.move()
 
 
+'''
+    Move the bot to a specific location
+'''
 def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location: Tuple[int,int]):
     if current_location == target_location:
         return
@@ -84,6 +106,9 @@ def find_waste_index(items: List[dict], waste_type: str):
 
     return -1
 
+'''
+    dump waste in the appropriate bin
+'''
 def dump(bkend: IBackend, inst: instance.Instance, current_location: Tuple[int, int]):
     organic_bin_loc = inst.bin_location_organic
     recycle_bin_loc = inst.bin_location_recycle
@@ -132,5 +157,60 @@ def dump(bkend: IBackend, inst: instance.Instance, current_location: Tuple[int, 
             bkend.unload_item(items_held[waste_index]['id'])
             items_held.pop(waste_index)
             dumped_garbage += 1
+
+'''
+    Clip coordinate between 0 and a set maximum. return a tuple containing the coord
+'''
+def clip_coord(x, y, max_x, max_y):
+
+    x = max(0, min(x, max_x-1))
+    y = max(0, min(y, max_y-1))
+    return (x, y)
     
-    
+
+'''
+    Get ideal scan path coordinates
+'''
+def get_scan_path(size_x: int, size_y: int, scan_w):
+    path = []
+
+    curr_x = 0
+    curr_y = 0
+
+    # always start at top
+    path.append((curr_x, curr_y))
+
+    half_w = math.ceil(scan_w/2)
+
+    stride_x = scan_w + 1
+
+    stride_y = -scan_w
+
+    # from top left until we are completely out of bounds 
+    # (last scan would ideally be the bottom right corner)
+    while True:
+
+        # if we're out of bounds already, go down our scan width +1 and our scan width over to the right.
+        if curr_x >= size_x or curr_x < 0 \
+            or curr_y >= size_y or curr_y < 0:
+
+            if curr_x >= (size_x - scan_w) and (curr_y >= size_y - scan_w):
+                break
+
+            curr_y += scan_w + 1
+            curr_x += scan_w
+
+            # add the start of the next spiral to our path
+            path.append(clip_coord(curr_x, curr_y, size_x, size_y))
+
+            # reverse x and y direction.
+            stride_x *= -1
+            stride_y *= -1
+
+        # stride no matter what
+        curr_x += stride_x
+        curr_y += stride_y
+
+        path.append(clip_coord(curr_x, curr_y, size_x, size_y))
+
+    return path
