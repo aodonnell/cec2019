@@ -1,5 +1,7 @@
 import utils
+import backend
+import instance
 
 
-def search(point: utils.Point):
+def search(instance: instance.Instance, backend: backend.IBackend, point: utils.Point):
     pass

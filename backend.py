@@ -59,7 +59,7 @@ def post(url):
 
 
 # noinspection PyMethodMayBeStatic
-class Backend:
+class Backend(IBackend):
     """
     Create the current instance
     """
