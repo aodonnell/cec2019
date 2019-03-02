@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import Tuple, List, Optional
 
 import instance
@@ -68,5 +69,136 @@ def closest_point(points: List[Point], target: Point) -> Optional[Point]:
     return closest[1]
 
 
-def dump_garbage(bkend: IBackend, inst: instance.Instance):
-    pass
+def find_waste_index(items: List[dict], waste_type: str):
+    for i in range(0, len(items)):
+        if items[i]['type'] == waste_type:
+            return i
+
+    return -1
+
+
+def dump(bkend: IBackend, inst: instance.Instance):
+    """
+    dump waste in the appropriate bin
+
+    :param bkend:
+    :param inst:
+    :param current_location:
+    :return:
+    """
+    organic_bin_loc = inst.bin_location_organic
+    recycle_bin_loc = inst.bin_location_recycle
+    garbage_bin_loc = inst.bin_location_garbage
+
+    organic_bin_cap = inst.capacity_organic
+    recycle_bin_cap = inst.capacity_recycle
+    garbage_bin_cap = inst.capacity_garbage
+
+    items_held = inst.items_held
+
+    while items_held:
+        dumped_organic = 0
+        dumped_recycle = 0
+        dumped_garbage = 0
+
+        inst.move_to_point(organic_bin_loc)
+        while dumped_organic <= organic_bin_cap:
+            waste_index = find_waste_index(items_held, 'ORGANIC')
+
+            if waste_index == -1:
+                break
+
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_organic += 1
+
+        inst.move_to_point(recycle_bin_loc)
+        while dumped_recycle <= recycle_bin_cap:
+            waste_index = find_waste_index(items_held, 'RECYCLE')
+
+            if waste_index == -1:
+                break
+
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_recycle += 1
+
+        inst.move_to_point(garbage_bin_loc)
+        while dumped_garbage <= garbage_bin_cap:
+            waste_index = find_waste_index(items_held, 'GARBAGE')
+
+            if waste_index == -1:
+                break
+
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_garbage += 1
+
+
+def clip_coord(x, y, max_x, max_y):
+    """
+    Clip coordinate between 0 and a set maximum. return a tuple containing the coord
+
+    :param x:
+    :param y:
+    :param max_x:
+    :param max_y:
+    :return:
+    """
+
+    x = max(0, min(x, max_x - 1))
+    y = max(0, min(y, max_y - 1))
+    return x, y
+
+
+def get_scan_path(size_x: int, size_y: int, scan_w):
+    """
+    Get ideal scan path coordinates
+
+    :param size_x:
+    :param size_y:
+    :param scan_w:
+    :return:
+    """
+    path = []
+
+    curr_x = 0
+    curr_y = 0
+
+    # always start at top
+    path.append((curr_x, curr_y))
+
+    half_w = math.ceil(scan_w / 2)
+
+    stride_x = scan_w + 1
+
+    stride_y = -scan_w
+
+    # from top left until we are completely out of bounds 
+    # (last scan would ideally be the bottom right corner)
+    while True:
+
+        # if we're out of bounds already, go down our scan width +1 and our scan width over to the right.
+        if curr_x >= size_x or curr_x < 0 \
+                or curr_y >= size_y or curr_y < 0:
+
+            if curr_x >= (size_x - scan_w) and (curr_y >= size_y - scan_w):
+                break
+
+            curr_y += scan_w + 1
+            curr_x += scan_w
+
+            # add the start of the next spiral to our path
+            path.append(clip_coord(curr_x, curr_y, size_x, size_y))
+
+            # reverse x and y direction.
+            stride_x *= -1
+            stride_y *= -1
+
+        # stride no matter what
+        curr_x += stride_x
+        curr_y += stride_y
+
+        path.append(clip_coord(curr_x, curr_y, size_x, size_y))
+
+    return path
