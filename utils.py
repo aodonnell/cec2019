@@ -35,7 +35,7 @@ def transform_path(inst, starting_point: Tuple[int, int], path: list):
 
 
 def clamp(value: int, maximum: int):
-    return max(0, min(maximum, value))
+    return max(0, min(maximum - 1, value))
 
 
 def points_around(point: Tuple[int, int], radius: int, x_max: int, y_max: int):

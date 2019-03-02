@@ -9,9 +9,12 @@ LOG = utils.get_logger(__file__)
 
 def algo(inst: instance.Instance):
     # get all possible points
-    points = inst.all_points
+    points = utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)  # inst.all_points
 
-    for point in points[:5]:
+    for i, point in enumerate(points):
+        LOG.info('--------------------------------------------')
+        LOG.info('--------------------------------------------')
+        LOG.info(f'Step -> {i} / {len(points)}')
         LOG.info('--------------------------------------------')
         LOG.info(f'Moving to {point} from {inst.current_point}')
         inst.move_to_point(point)
