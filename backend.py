@@ -2,6 +2,9 @@ import abc
 
 import requests
 
+import utils
+
+LOG = utils.get_logger(__file__)
 BASE = 'http://cec2019.ca'
 API_TOKEN = 'brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ'
 
@@ -45,20 +48,43 @@ class IBackend(abc.ABC):
         pass
 
 
-# Request Wrappers for Attaching API Token
+def request(method, url):
+    """
+    Request Wrappers for Attaching API Token
+
+    :param method: The method.
+    :param url: The url.
+    :return: The response.
+    """
+    res = requests.request(method, BASE + url, headers={'token': API_TOKEN})
+    body = res.json()
+
+    t = body['type']
+    if t == 'ERROR':
+        raise RuntimeError(body['message'])
+
+    if t == 'FAILURE':
+        raise RuntimeError(body['message'])
+
+    if t != 'SUCCESS':
+        raise RuntimeError(f'Unknown type: {t}')
+
+    return body['payload']
+
+
 def get(url):
-    return requests.get(BASE + url, headers={'token': API_TOKEN})
+    return request('GET', url)
 
 
 def delete(url):
-    return requests.delete(BASE + url, headers={'token': API_TOKEN})
+    return request('DELETE', url)
 
 
 def post(url):
-    return requests.post(BASE + url, headers={'token': API_TOKEN})
+    return request('POST', url)
 
 
-# noinspection PyMethodMayBeStatic
+# noinspection PyMethodMayBeStatic,PyShadowingBuiltins
 class Backend(IBackend):
     """
     Create the current instance

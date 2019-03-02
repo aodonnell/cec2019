@@ -9,6 +9,7 @@ class Instance:
     x_max: int
     y_min: int
     y_max: int
+    radius: int
     located: List[List[int]] = dataclasses.field(init=False, default_factory=list)
 
     @property
@@ -32,4 +33,5 @@ class Instance:
             dimensions['X_MAX'],
             dimensions['Y_MIN'],
             dimensions['Y_MAX'],
+            constants['SCAN_RADIUS'],
         )

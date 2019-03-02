@@ -1,0 +1,179 @@
+{
+    "type": "SUCCESS",
+    "payload": {
+        "id": "brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ",
+        "location": {
+            "x": 9,
+            "y": 9
+        },
+        "direction": "N",
+        "finished": false,
+        "timeSpent": 4,
+        "itemsLocated": [
+            {
+                "id": 15,
+                "x": 9,
+                "y": 8,
+                "type": "GARBAGE"
+            },
+            {
+                "id": 18,
+                "x": 8,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 19,
+                "x": 8,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 22,
+                "x": 9,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 23,
+                "x": 9,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 24,
+                "x": 10,
+                "y": 9,
+                "type": "GARBAGE"
+            },
+            {
+                "id": 25,
+                "x": 10,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 26,
+                "x": 10,
+                "y": 9,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 29,
+                "x": 9,
+                "y": 10,
+                "type": "GARBAGE"
+            },
+            {
+                "id": 30,
+                "x": 9,
+                "y": 10,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 31,
+                "x": 9,
+                "y": 10,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 32,
+                "x": 10,
+                "y": 10,
+                "type": "RECYCLE"
+            },
+            {
+                "id": 33,
+                "x": 10,
+                "y": 10,
+                "type": "RECYCLE"
+            },
+            {
+                "id": 34,
+                "x": 11,
+                "y": 10,
+                "type": "GARBAGE"
+            },
+            {
+                "id": 35,
+                "x": 11,
+                "y": 10,
+                "type": "RECYCLE"
+            },
+            {
+                "id": 36,
+                "x": 11,
+                "y": 10,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 37,
+                "x": 11,
+                "y": 10,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 38,
+                "x": 10,
+                "y": 11,
+                "type": "GARBAGE"
+            },
+            {
+                "id": 39,
+                "x": 10,
+                "y": 11,
+                "type": "ORGANIC"
+            },
+            {
+                "id": 40,
+                "x": 10,
+                "y": 11,
+                "type": "ORGANIC"
+            }
+        ],
+        "itemsHeld": [],
+        "itemsBin": [],
+        "itemsCollected": [],
+        "constants": {
+            "ROOM_DIMENSIONS": {
+                "X_MIN": 0,
+                "X_MAX": 19,
+                "Y_MIN": 0,
+                "Y_MAX": 19
+            },
+            "BIN_LOCATION": {
+                "ORGANIC": {
+                    "X": 19,
+                    "Y": 6
+                },
+                "RECYCLE": {
+                    "X": 19,
+                    "Y": 7
+                },
+                "GARBAGE": {
+                    "X": 19,
+                    "Y": 8
+                }
+            },
+            "TIME": {
+                "TURN": 1,
+                "MOVE": 1,
+                "SCAN_AREA": 4,
+                "COLLECT_ITEM": 2,
+                "UNLOAD_ITEM": 2
+            },
+            "TOTAL_COUNT": {
+                "ORGANIC": 70,
+                "RECYCLE": 60,
+                "GARBAGE": 60
+            },
+            "BIN_CAPACITY": {
+                "ORGANIC": 25,
+                "RECYCLE": 15,
+                "GARBAGE": 20
+            },
+            "BIN_COLLECTION_CYCLE": 150,
+            "SCAN_RADIUS": 3
+        }
+    }
+}
