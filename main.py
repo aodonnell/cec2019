@@ -1,3 +1,4 @@
+import algo
 import backend
 import instance
 import utils
@@ -11,7 +12,8 @@ def main():
     try:
         LOG.info('Creating instance')
         inst = instance.Instance.from_backend(back)
-
+        LOG.info('Running the algorithm')
+        algo.algo(inst)
     finally:
         LOG.info('Deleting instance')
         back.delete_instance()
