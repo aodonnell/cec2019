@@ -1,4 +1,5 @@
 import abc
+import json
 
 import requests
 
@@ -7,6 +8,7 @@ import utils
 LOG = utils.get_logger(__file__)
 BASE = 'http://cec2019.ca'
 API_TOKEN = 'brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ'
+PATH = '/tmp/instance.json'
 
 
 # noinspection PyShadowingBuiltins
@@ -51,6 +53,7 @@ class IBackend(abc.ABC):
 class RuntimeFailure(RuntimeError):
     pass
 
+
 def request(method, url):
     """
     Request Wrappers for Attaching API Token
@@ -74,9 +77,9 @@ def request(method, url):
     if t != 'SUCCESS':
         raise RuntimeError(f'Unknown type: {t}')
 
-    # if body['payload'] is not None:
-    #     with open('payload.json', 'w') as fp:
-    #         json.dump(body['payload'], fp)
+    if body['payload'] is not None:
+        with open(PATH, 'w') as fp:
+            json.dump(body['payload'], fp)
 
     return body['payload']
 

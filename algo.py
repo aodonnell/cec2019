@@ -11,7 +11,8 @@ def algo(inst: instance.Instance):
     # get all possible points
     points = inst.all_points
 
-    for point in points[:10]:
+    for point in points[:5]:
+        LOG.info('--------------------------------------------')
         LOG.info(f'Moving to {point} from {inst.current_point}')
         inst.move_to_point(point)
         inst.scan()
@@ -73,10 +74,11 @@ def dump(inst: instance.Instance):
             return
 
         t = items[0]['type']
-        LOG.info(f'Moving to the {t} bin at {point}')
+        LOG.info(f'Moving to the {t} bin at {point} to try and add {len(items)} items!')
 
         inst.move_to_point(point)
-        for i, item in enumerate(items):
+        # make sure to go in reverse since we will be deleting along the way
+        for i, item in reversed(list(enumerate(items))):
             try:
                 inst.unload(item, i)
             except RuntimeFailure as e:
@@ -87,3 +89,5 @@ def dump(inst: instance.Instance):
         unload(inst.bin_location_organic, inst.held_organic)
         unload(inst.bin_location_recycle, inst.held_recycle)
         unload(inst.bin_location_garbage, inst.held_garbage)
+
+    LOG.info('Finished dumping contents')
