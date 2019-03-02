@@ -28,6 +28,7 @@ class Instance:
     bin_location_organic: utils.Point
     bin_location_recycle: utils.Point
     bin_location_garbage: utils.Point
+    items_held: List[dict] = []
     time_spent: int = 0
     located: List[List[Dict[int, dict]]] = dataclasses.field(init=False, default_factory=list)
 
@@ -77,5 +78,5 @@ class Instance:
             totals['GARBAGE'],
             (locations['ORGANIC']['X'], locations['ORGANIC']['Y']),
             (locations['RECYCLE']['X'], locations['RECYCLE']['Y']),
-            (locations['GARBAGE']['X'], locations['GARBAGE']['Y']),
+            (locations['GARBAGE']['X'], locations['GARBAGE']['Y'])
         )
