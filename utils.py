@@ -18,6 +18,7 @@ def get_logger(name: str, level=logging.INFO):
 
     return logger
 
+
 def find_nearest_corner(inst, starting_point: Tuple[int, int]):
     top_right_dist = manhattan_distance(starting_point, [inst.x_max, inst.y_min])
     top_left_dist = manhattan_distance(starting_point, [inst.x_min, inst.y_min])

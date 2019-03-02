@@ -9,7 +9,7 @@ LOG = utils.get_logger(__file__)
 BASE = 'http://cec2019.ca'
 API_TOKEN = 'brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ'
 PATH = '/tmp/instance.json'
-ENABLE_FRONTEND = True
+ENABLE_FRONTEND = False
 
 
 # noinspection PyShadowingBuiltins

@@ -9,7 +9,7 @@ LOG = utils.get_logger(__file__)
 
 def algo(inst: instance.Instance):
     # get all possible points
-    points = utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)  # inst.all_points
+    points = inst.all_points  # utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)  # inst.all_points
 
     for i, point in enumerate(points):
         LOG.info('--------------------------------------------')
@@ -84,8 +84,10 @@ def dump(inst: instance.Instance):
         for i, item in reversed(list(enumerate(items))):
             try:
                 inst.unload(item, i)
-            except RuntimeFailure as e:
-                print(e)
+                LOG.info(f'Added {t} item to bin.')
+            except RuntimeFailure:
+                LOG.info(f'{t} bin at capacity. Moving to the next location.')
+                # print(e)
                 break
 
     while inst.held_garbage or inst.held_organic or inst.held_recycle:
