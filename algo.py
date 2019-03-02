@@ -87,6 +87,7 @@ def dump(inst: instance.Instance):
                 LOG.info(f'Added {t} item to bin.')
             except RuntimeFailure:
                 LOG.info(f'{t} bin at capacity. Moving to the next location.')
+                inst.move_to_point((point[0], point[1] - 1))
                 # print(e)
                 break
 
