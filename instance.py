@@ -43,11 +43,21 @@ class Instance:
         # Init the grid to x_size by y_size
         self.located = [[dict() for _ in range(self.y_size)] for _ in range(self.x_size)]
 
-    def scan(self, back: backend.Backend):
+    def scan(self, back: backend.IBackend):
         payload = back.scan()
+        self.time_spent += self.time_scan
 
         for item in payload['itemsLocated']:
             self.located[item['x']][item['y']][item['id']] = item
+
+    def collect(self, back: backend.IBackend, x: int, y: int, item_id: int):
+        back.collect_item(item_id)
+
+        # delete from located upon completion
+        item = self.located[x][y][item_id]
+        del self.located[x][y][item_id]
+
+        # TODO Add to held!!
 
     @classmethod
     def from_payload(cls, payload: dict):

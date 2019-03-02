@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import instance
 from backend import IBackend
@@ -49,6 +49,22 @@ def points_around(point: Tuple[int, int], radius: int, x_max: int, y_max: int):
 
 def manhattan_distance(p1: Point, p2: Point):
     return abs(p2[0] - p1[0]) + abs(p2[1] - p1[1])
+
+
+def closest_point(points: List[Point], target: Point) -> Optional[Point]:
+    closest: Tuple[int, Point] = None
+
+    for around in points:
+        distance = manhattan_distance(around, target)
+        if closest and distance >= closest[0]:
+            continue
+
+        closest = (distance, around)
+
+    if closest is None:
+        return None
+
+    return closest[1]
 
 
 def move_steps(bkend: IBackend, num_of_steps: int):
