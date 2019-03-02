@@ -92,3 +92,6 @@ def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location
     elif y_change < 0:
         bkend.turn('S')
         move_steps(bkend, abs(y_change))
+
+def dump_garbage(bkend: IBackend, inst: instance.Instance):
+    pass
