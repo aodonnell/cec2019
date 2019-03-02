@@ -17,7 +17,20 @@ Your goal with this task is to design a robot that can cleanup the entire eatery
 An access token to the simulation server via API will be provided. A design room with at least one table, four chairs, a whiteboard or blackboard, paper and pencils/pens for writing, as well as access to a computer with internet connectivity, will be provided during the 8-hour design phase. A presentation room with a digital projector, a computer containing the team’s presentation file, a whiteboard or blackboard, and simultaneous translation equipment if required will be provided during the presentation phase.
 
 ## Environment Setup
+Make sure you have `pipenv` installed then run the following command.
 ```
-# with your virtualenv activated
-pip install -r requirements.txt
+# if you are using pipenv
+pipenv install --skip-lock [--dev]
+```
+
+## Running
+Activate your virtual environment the run the following command.
+```
+python main.py
+```
+
+## Testing
+Make sure you have the dev dependencies installed and your virtual environment activated then run the following command.
+```
+pytest
 ```

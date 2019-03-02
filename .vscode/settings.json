@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
+    "pipenv",
     "virtualenv"
-  ],
+],
   "editor.tabSize": 4
 }
