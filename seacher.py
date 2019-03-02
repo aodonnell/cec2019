@@ -25,6 +25,9 @@ def search(inst: instance.Instance, backend: backend.IBackend, point: utils.Poin
         return
 
     # move to the closest location with trash
-    utils.mov_bot(point, closest)
+    utils.move_bot(backend, point, closest[1])
+
+
+    backend.collect_item()
 
 
