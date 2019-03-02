@@ -18,13 +18,32 @@ def get_logger(name: str, level=logging.INFO):
 
     return logger
 
+def find_nearest_corner(inst, starting_point: Tuple[int, int]):
+    top_right_dist = manhattan_distance(starting_point, [inst.x_max, inst.y_min])
+    top_left_dist = manhattan_distance(starting_point, [inst.x_min, inst.y_min])
+    bottom_right_dist = manhattan_distance(starting_point, [inst.x_max, inst.y_max])
+    bottom_left_dist = manhattan_distance(starting_point, [inst.x_max, inst.y_min])
 
-def transform_path(inst, starting_point: Tuple[int, int], path: list):
-    if starting_point[0] == inst.x_min and starting_point[1] == inst.x_min:
+    coordinates = {
+        top_right_dist: (inst.x_max, inst.y_min),
+        top_left_dist: (inst.x_min, inst.ymin),
+        bottom_right_dist: (inst.x_max, inst.y_max),
+        bottom_left_dist: (inst.x_max, inst.y_min)
+    }
+
+    return coordinates[min(top_right_dist,
+                           top_left_dist,
+                           bottom_right_dist,
+                           bottom_left_dist)]
+
+
+
+def transform_path(inst, starting_corner: Tuple[int, int], path: list):
+    if starting_corner[0] == inst.x_min and starting_corner[1] == inst.x_min:
         transformed_path = path
-    elif starting_point[0] == inst.x_max and starting_point[1] == inst.y_max:
+    elif starting_corner[0] == inst.x_max and starting_corner[1] == inst.y_max:
         transformed_path = path[::-1]
-    elif starting_point[0] == inst.x_max and starting_point[1] == inst.y_min:
+    elif starting_corner[0] == inst.x_max and starting_corner[1] == inst.y_min:
         transformed_path = [(x, -y) for (x, y) in path]
     else:
         transformed_path = [(-x, y) for (x, y) in path]
