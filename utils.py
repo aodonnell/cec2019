@@ -106,9 +106,7 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            inst.unload(items_held[waste_index]['id'])
-            bkend.unload_item()
-            items_held.pop(waste_index)
+            inst.unload(waste_index)
             dumped_organic += 1
 
         inst.move_to_point(recycle_bin_loc)
@@ -118,8 +116,7 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            bkend.unload_item(items_held[waste_index]['id'])
-            items_held.pop(waste_index)
+            inst.unload(waste_index)
             dumped_recycle += 1
 
         inst.move_to_point(garbage_bin_loc)
@@ -129,8 +126,7 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            bkend.unload_item(items_held[waste_index]['id'])
-            items_held.pop(waste_index)
+            inst.unload(waste_index)
             dumped_garbage += 1
 
 

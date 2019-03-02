@@ -103,6 +103,7 @@ class Instance:
         item = self.items_held[i]
         self.back.unload_item(item['id'])
         self.time_spent += self.time_unload
+        self.items_held.pop(i)
 
     @classmethod
     def from_backend(cls, back: backend.IBackend):
