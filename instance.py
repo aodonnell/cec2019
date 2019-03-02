@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import backend
 import dataclasses
@@ -8,6 +8,7 @@ import utils
 
 @dataclasses.dataclass
 class Instance:
+    back: backend.IBackend
     x_min: int
     x_max: int
     y_min: int
@@ -28,7 +29,8 @@ class Instance:
     bin_location_organic: utils.Point
     bin_location_recycle: utils.Point
     bin_location_garbage: utils.Point
-    items_held: List[dict] = []
+    current_point: utils.Point
+    items_held: List[dict] = dataclasses.field(default_factory=list)
     time_spent: int = 0
     located: List[List[Dict[int, dict]]] = dataclasses.field(init=False, default_factory=list)
 
@@ -44,24 +46,54 @@ class Instance:
         # Init the grid to x_size by y_size
         self.located = [[dict() for _ in range(self.y_size)] for _ in range(self.x_size)]
 
-    def scan(self, back: backend.IBackend):
-        payload = back.scan()
+    def scan(self):
+        payload = self.back.scan()
         self.time_spent += self.time_scan
 
         for item in payload['itemsLocated']:
             self.located[item['x']][item['y']][item['id']] = item
 
-    def collect(self, back: backend.IBackend, x: int, y: int, item_id: int):
-        back.collect_item(item_id)
+    def collect(self, x: int, y: int, item_id: int):
+        self.back.collect_item(item_id)
+        self.time_spent += self.time_collect
 
         # delete from located upon completion
         item = self.located[x][y][item_id]
         del self.located[x][y][item_id]
 
-        # TODO Add to held!!
+        self.items_held.append(item)
+
+    def _move(self):
+        self.back.move()
+        self.time_spent += self.time_move
+
+    def move_to_point(self, target: Tuple[int, int]):
+        if self.current_point == target:
+            return
+
+        def move_steps(num_of_steps: int):
+            for _ in range(num_of_steps):
+                self._move()
+
+        x_change = target[0] - self.current_point[0]
+        y_change = target[1] - self.current_point[1]
+
+        if x_change > 0:
+            self.back.turn('E')
+        elif x_change < 0:
+            self.back.turn('W')
+        move_steps(abs(x_change))
+
+        if y_change > 0:
+            self.back.turn('N')
+        elif y_change < 0:
+            self.back.turn('S')
+        move_steps(abs(y_change))
 
     @classmethod
-    def from_payload(cls, payload: dict):
+    def from_backend(cls, back: backend.IBackend):
+        payload = back.create_instance()
+
         constants = payload['constants']
         dimensions = constants['ROOM_DIMENSIONS']
         time = constants['TIME']
@@ -69,6 +101,7 @@ class Instance:
         totals = constants['TOTAL_COUNT']
         locations = constants['BIN_LOCATION']
         return cls(
+            back,
             dimensions['X_MIN'],
             dimensions['X_MAX'],
             dimensions['Y_MIN'],
@@ -88,5 +121,6 @@ class Instance:
             totals['GARBAGE'],
             (locations['ORGANIC']['X'], locations['ORGANIC']['Y']),
             (locations['RECYCLE']['X'], locations['RECYCLE']['Y']),
-            (locations['GARBAGE']['X'], locations['GARBAGE']['Y'])
+            (locations['GARBAGE']['X'], locations['GARBAGE']['Y']),
+            (payload['location']['x'], payload['location']['y']),
         )

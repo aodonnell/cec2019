@@ -7,6 +7,7 @@ from backend import IBackend
 FORMAT = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 
 Point = Tuple[int, int]
+Points = List[Point]
 
 
 def get_logger(name: str, level=logging.INFO):
@@ -66,32 +67,6 @@ def closest_point(points: List[Point], target: Point) -> Optional[Point]:
 
     return closest[1]
 
-
-def move_steps(bkend: IBackend, num_of_steps: int):
-    for _ in range(num_of_steps):
-        bkend.move()
-
-
-def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location: Tuple[int,int]):
-    if current_location == target_location:
-        return
-    
-    x_change = target_location[0] - current_location[0]
-    y_change = target_location[1] - current_location[1]
-
-    if x_change > 0:
-        bkend.turn('E')
-        move_steps(bkend, abs(x_change))
-    elif x_change < 0:
-        bkend.turn('W')
-        move_steps(bkend, abs(x_change))
-
-    if y_change > 0:
-        bkend.turn('N')
-        move_steps(bkend, abs(y_change))
-    elif y_change < 0:
-        bkend.turn('S')
-        move_steps(bkend, abs(y_change))
 
 def dump_garbage(bkend: IBackend, inst: instance.Instance):
     pass

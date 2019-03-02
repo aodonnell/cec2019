@@ -1,15 +1,25 @@
 from typing import List
 
 import utils
-import backend
 import instance
+
+
+def algo(inst: instance.Instance):
+    # get points
+    points: utils.Points = []
+
+    for point in points:
+        inst.move_to_point(point)
+        inst.scan()
+
+        search(inst, point)
 
 
 def _filter_no_items(inst: instance.Instance, points: List[utils.Point]):
     return list(filter(lambda p: len(inst.located[p[0]][p[1]]) != 0, points))
 
 
-def search(inst: instance.Instance, back: backend.IBackend, point: utils.Point):
+def search(inst: instance.Instance, point: utils.Point):
     points_around = utils.points_around(point, inst.radius, inst.x_size, inst.y_size)
 
     # remove all that don't have any items
@@ -22,23 +32,19 @@ def search(inst: instance.Instance, back: backend.IBackend, point: utils.Point):
 
     point_within_radius = utils.points_around(closest, inst.radius, inst.x_size, inst.y_size)
     point_within_radius = _filter_no_items(inst, point_within_radius)
-    next_point = closest
     current_point = closest
-    while next_point is not None:
-        point_within_radius = list(filter(lambda p: p != next_point, point_within_radius))
-
-        if current_point != next_point:
-            utils.move_bot(back, current_point, next_point)
-        current_point = next_point
-        next_point = utils.closest_point(point_within_radius, current_point)
-
+    while current_point is not None:
+        inst.move_to_point(current_point)
         # Make a shallow copy of the list because collect will delete from located
         x, y = current_point[1]
         for item_id in list(inst.located[x][y]):
-            inst.collect(back, item_id, x, y)
+            inst.collect(item_id, x, y)
+
+        point_within_radius = list(filter(lambda p: p != current_point, point_within_radius))
+        current_point = utils.closest_point(point_within_radius, current_point)
 
     # move back to the anchor position
-    utils.move_bot(back, point, closest)
-    inst.scan(back)
+    inst.move_to_point(closest)
+    inst.scan()
 
-    search(inst, back, closest)
+    search(inst, closest)
