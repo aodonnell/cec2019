@@ -52,9 +52,8 @@ def manhattan_distance(p1: Point, p2: Point):
 
 
 def move_steps(bkend: IBackend, num_of_steps: int):
-    while num_of_steps >= 0:
+    for _ in range(num_of_steps):
         bkend.move()
-        num_of_steps -= 1
 
 
 def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location: Tuple[int,int]):
@@ -64,35 +63,16 @@ def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location
     x_change = target_location[0] - current_location[0]
     y_change = target_location[1] - current_location[1]
 
-    if x_change > 0 and y_change == 0:
+    if x_change > 0:
         bkend.turn('E')
         move_steps(bkend, abs(x_change))
-    elif x_change < 0 and y_change == 0:
+    elif x_change < 0:
         bkend.turn('W')
         move_steps(bkend, abs(x_change))
-    elif x_change == 0 and y_change > 0:
+
+    if y_change > 0:
         bkend.turn('N')
         move_steps(bkend, abs(x_change))
-    elif x_change == 0 and y_change < 0:
+    elif y_change < 0:
         bkend.turn('S')
         move_steps(bkend, abs(y_change))
-    elif x_change < 0 and y_change < 0:
-        bkend.turn('S')
-        move_steps(bkend, abs(y_change))
-        bkend.turn('W')
-        move_steps(bkend, abs(x_change))
-    elif x_change > 0 and y_change < 0:
-        bkend.turn('S')
-        move_steps(bkend, abs(y_change))
-        bkend.turn('E')
-        move_steps(bkend, abs(x_change))
-    elif x_change < 0 and y_change > 0:
-        bkend.turn('N')
-        move_steps(bkend, abs(y_change))
-        bkend.turn('W')
-        move_steps(bkend, abs(x_change))
-    else:
-        bkend.turn('N')
-        move_steps(bkend, abs(y_change))
-        bkend.turn('E')
-        move_steps(bkend, abs(x_change))
