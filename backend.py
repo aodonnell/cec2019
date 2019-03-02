@@ -9,6 +9,7 @@ LOG = utils.get_logger(__file__)
 BASE = 'http://cec2019.ca'
 API_TOKEN = 'brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ'
 PATH = '/tmp/instance.json'
+ENABLE_FRONTEND = True
 
 
 # noinspection PyShadowingBuiltins
@@ -78,8 +79,8 @@ def request(method, url):
         raise RuntimeError(f'Unknown type: {t}')
 
     if body['payload'] is not None:
-        with open(PATH, 'w') as fp:
-            json.dump(body['payload'], fp)
+        if ENABLE_FRONTEND:
+            requests.request('POST', 'http://localhost:3000/update', headers={'content-type': 'application/json'},  data=json.dumps(body['payload']))
 
     return body['payload']
 
@@ -111,9 +112,11 @@ class Backend(IBackend):
         return get('/instance')
 
     """
-    Delete the current instance
+    Delete the current instance, and notify the frontend
     """
     def delete_instance(self):
+        if ENABLE_FRONTEND:
+            requests.request('POST', 'http://localhost:3000/close')
         return delete('/instance')
 
     """
