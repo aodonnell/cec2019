@@ -77,5 +77,60 @@ def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location
         bkend.turn('S')
         move_steps(bkend, abs(y_change))
 
-def dump_garbage(bkend: IBackend, inst: instance.Instance):
-    pass
+def find_waste_index(items: List[dict], waste_type: str):
+    for i in range(0, len(items)):
+        if (items[i]['type'] == waste_type):
+            return i
+
+    return -1
+
+def dump(bkend: IBackend, inst: instance.Instance, current_location: Tuple[int, int]):
+    organic_bin_loc = inst.bin_location_organic
+    recycle_bin_loc = inst.bin_location_recycle
+    garbage_bin_loc = inst.bin_location_garbage
+
+    organic_bin_cap = inst.capacity_organic
+    recycle_bin_cap = inst.capacity_recycle
+    garbage_bin_cap = inst.capacity_garbage
+
+    items_held = inst.items_held
+
+    while items_held:
+        dumped_organic = 0
+        dumped_recycle = 0
+        dumped_garbage = 0
+
+        move_bot(bkend, current_location, organic_bin_loc)        
+        while dumped_organic <= organic_bin_cap:
+            waste_index = find_waste_index(items_held, 'ORGANIC')
+            
+            if (waste_index == -1):
+                break
+
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_organic += 1
+        
+        move_bot(bkend, current_location, recycle_bin_loc)
+        while dumped_recycle <= recycle_bin_cap:
+            waste_index = find_waste_index(items_held, 'RECYCLE')
+
+            if (waste_index == -1):
+                break
+                
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_recycle += 1
+
+        move_bot(bkend, current_location, garbage_bin_loc)
+        while dumped_garbage <= garbage_bin_cap:
+            waste_index = find_waste_index(items_held, 'GARBAGE')
+
+            if (waste_index == -1):
+                break
+                
+            bkend.unload_item(items_held[waste_index]['id'])
+            items_held.pop(waste_index)
+            dumped_garbage += 1
+    
+    
