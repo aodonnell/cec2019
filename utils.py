@@ -1,9 +1,11 @@
 import logging
+import instance
 from typing import Tuple
-
+from backend import IBackend
 
 FORMAT = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 
+Point = Tuple[int, int]
 
 def get_logger(name: str, level=logging.INFO):
     logger = logging.getLogger(name)
@@ -15,29 +17,22 @@ def get_logger(name: str, level=logging.INFO):
 
     return logger
 
-
-def transform_path(instance, starting_x, starting_y, path: list):
-
-    if(starting_x == instance.x_min and starting_y == instance.x_min):
+def transform_path(inst: instance.Instance, starting_point: Tuple[int, int], path: list):
+    if(starting_point[0] == inst.x_min and starting_point[1] == inst.x_min):
         transformed_path = path
-    elif(starting_x == instance.x_max and starting_y == instance.y_max):
-         transformed_path = path.reverse()
-    elif(starting_x == instance.x_max and starting_y == instance.y_min):
-         transformed_path = [(x,-y) for x,y in path]
+    elif(starting_point[0] == inst.x_max and starting_point[1] == inst.y_max):
+         transformed_path = path[::-1]
+    elif(starting_point[0] == inst.x_max and starting_point[1] == inst.y_min):
+         transformed_path = [(x, -y) for (x,y) in path]
     else:
-         transformed_path = [(-x,y) for x,y in path]
+         transformed_path = [(-x, y) for (x,y) in path]
     
-    translated_path = [(x + instance.x_min, y + instance.y_min) for (x,y) in transformed_path]
+    translated_path = [(x + inst.x_min, y + inst.y_min) for (x,y) in transformed_path]
 
     return translated_path
 
-
-Point = Tuple[int, int]
-
-
 def clamp(value: int, maximum: int):
     return max(0, min(maximum, value))
-
 
 def points_around(point: Tuple[int, int], radius: int, x_max: int, y_max: int):
     for y in range(-radius, radius + 1):
@@ -46,3 +41,48 @@ def points_around(point: Tuple[int, int], radius: int, x_max: int, y_max: int):
             #     continue
 
             yield [(clamp(point[0] + x, x_max), clamp(point[1] + y, y_max))]
+
+def move_steps(bkend: IBackend, num_of_steps: int):
+    while num_of_steps >= 0:
+        bkend.move()
+        num_of_steps -= 1
+
+def move_bot(bkend: IBackend, current_location: Tuple[int, int], target_location: Tuple[int,int]):
+    if current_location == target_location:
+        return
+    
+    x_change = target_location[0] - current_location[0]
+    y_change = target_location[1] - current_location[1]
+
+    if (x_change > 0 and y_change == 0):
+        bkend.turn('E')
+        move_steps(bkend, abs(x_change))
+    elif(x_change < 0 and y_change == 0):
+        bkend.turn('W')
+        move_steps(bkend, abs(x_change))
+    elif(x_change == 0 and y_change > 0):
+        bkend.turn('N')
+        move_steps(bkend, abs(x_change))
+    elif(x_change == 0 and y_change < 0):
+        bkend.turn('S')
+        move_steps(bkend, abs(y_change))
+    elif(x_change < 0 and y_change < 0):
+        bkend.turn('S')
+        move_steps(bkend, abs(y_change))
+        bkend.turn('W')
+        move_steps(bkend, abs(x_change))
+    elif(x_change > 0 and y_change < 0):
+        bkend.turn('S')
+        move_steps(bkend, abs(y_change))
+        bkend.turn('E')
+        move_steps(bkend, abs(x_change))
+    elif(x_change < 0 and y_change > 0):
+        bkend.turn('N')
+        move_steps(bkend, abs(y_change))
+        bkend.turn('W')
+        move_steps(bkend, abs(x_change))
+    else:
+        bkend.turn('N')
+        move_steps(bkend, abs(y_change))
+        bkend.turn('E')
+        move_steps(bkend, abs(x_change))
