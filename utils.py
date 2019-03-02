@@ -139,7 +139,7 @@ def get_scan_path(size_x: int, size_y: int, scan_w):
         x_out = (curr_x >= size_x + scan_w or curr_x < 0 - scan_w)
         y_out = (curr_y >= size_y + scan_w or curr_y < 0 - scan_w)
 
-        if x_out and y_out:
+        if curr_x >= size_x + scan_w  and curr_y >= size_y + scan_w:
             break
 
         if x_out or y_out:
@@ -152,9 +152,9 @@ def get_scan_path(size_x: int, size_y: int, scan_w):
                 curr_x += scan_w
             elif curr_x >= size_x + scan_w:
                 curr_y += 2*scan_w + 1
-                curr_x -= scan_w
+                curr_x -= 1
             elif curr_y < 0 - scan_w:
-                curr_y += scan_w
+                curr_y += 1
                 curr_x += 2*scan_w + 1
             else:
                 curr_y += scan_w
