@@ -3,7 +3,7 @@ import math
 from typing import Tuple, List, Optional
 
 import instance
-from backend import IBackend
+from backend import IBackend, RuntimeFailure
 
 FORMAT = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 
@@ -108,8 +108,13 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            inst.unload(waste_index)
-            dumped_organic += 1
+            try:
+                inst.unload(waste_index)
+                dumped_organic += 1
+            except RuntimeFailure as e:
+                print(e)
+                break
+
 
         inst.move_to_point(recycle_bin_loc)
         while dumped_recycle <= recycle_bin_cap:
@@ -118,8 +123,12 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            inst.unload(waste_index)
-            dumped_recycle += 1
+            try:
+                inst.unload(waste_index)
+                dumped_recycle += 1
+            except RuntimeFailure as e:
+                print(e)
+                break
 
         inst.move_to_point(garbage_bin_loc)
         while dumped_garbage <= garbage_bin_cap:
@@ -128,8 +137,12 @@ def dump(inst: instance.Instance):
             if waste_index == -1:
                 break
 
-            inst.unload(waste_index)
-            dumped_garbage += 1
+            try:
+                inst.unload(waste_index)
+                dumped_garbage += 1
+            except RuntimeFailure as e:
+                print(e)
+                break
 
 
 def clip_coord(x, y, max_x, max_y):
