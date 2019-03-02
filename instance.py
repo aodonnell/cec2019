@@ -5,6 +5,8 @@ import dataclasses
 
 import utils
 
+LOG = utils.get_logger(__file__)
+
 
 @dataclasses.dataclass
 class Instance:
@@ -31,9 +33,12 @@ class Instance:
     bin_location_recycle: utils.Point
     bin_location_garbage: utils.Point
     current_point: utils.Point
-    items_held: List[dict] = dataclasses.field(default_factory=list)
-    time_spent: int = 0
+    time_spent = 0
+    all_points: List[utils.Point] = dataclasses.field(init=False, default_factory=list)
     located: List[List[Dict[int, dict]]] = dataclasses.field(init=False, default_factory=list)
+    held_organic: List[dict] = dataclasses.field(default_factory=list)
+    held_recycle: List[dict] = dataclasses.field(default_factory=list)
+    held_garbage: List[dict] = dataclasses.field(default_factory=list)
 
     @property
     def x_size(self):
@@ -46,12 +51,18 @@ class Instance:
     def __post_init__(self):
         # Init the grid to x_size by y_size
         self.located = [[dict() for _ in range(self.y_size)] for _ in range(self.x_size)]
+        self.all_points = [(i, j) for j in range(self.y_size) for i in range(self.x_size)]
 
     def scan(self):
         payload = self.back.scan()
         self.time_spent += self.time_scan
 
         for item in payload['itemsLocated']:
+            if item['id'] in self.located[item['x']][item['y']]:
+                continue
+
+            x, y, t = item['x'], item['y'], item['type']
+            LOG.info(f'Adding {t} to ({x}, {y})')
             self.located[item['x']][item['y']][item['id']] = item
 
     def collect(self, x: int, y: int, item_id: int):
@@ -62,7 +73,15 @@ class Instance:
         item = self.located[x][y][item_id]
         del self.located[x][y][item_id]
 
-        self.items_held.append(item)
+        t = item['type']
+        if t == 'ORGANIC':
+            self.held_organic.append(item)
+        elif t == 'RECYCLE':
+            self.held_recycle.append(item)
+        elif t == 'GARBAGE':
+            self.held_garbage.append(item)
+        else:
+            raise RuntimeError(f'Unknown type: {t}')
 
     def _move(self):
         self.back.move()
@@ -91,6 +110,8 @@ class Instance:
             self.turn('S')
         move_steps(abs(y_change))
 
+        self.current_point = target
+
     def turn(self, direction: str):
         if self.direction == direction:
             return
@@ -99,11 +120,19 @@ class Instance:
         self.direction = direction
         self.time_spent += self.time_turn
 
-    def unload(self, i: int):
-        item = self.items_held[i]
+    def unload(self, item: dict, i: int):
         self.back.unload_item(item['id'])
         self.time_spent += self.time_unload
-        self.items_held.pop(i)
+
+        t = item['type']
+        if t == 'ORGANIC':
+            self.held_organic.pop(i)
+        elif t == 'RECYCLE':
+            self.held_recycle.pop(i)
+        elif t == 'GARBAGE':
+            self.held_garbage.pop(i)
+        else:
+            raise RuntimeError(f'Unknown type: {t}')
 
     @classmethod
     def from_backend(cls, back: backend.IBackend):
@@ -127,7 +156,7 @@ class Instance:
             time['MOVE'],
             time['SCAN_AREA'],
             time['COLLECT_ITEM'],
-            time['UNLOAD_TIME'],
+            time['UNLOAD_ITEM'],
             constants['BIN_COLLECTION_CYCLE'],
             capacities['ORGANIC'],
             capacities['RECYCLE'],

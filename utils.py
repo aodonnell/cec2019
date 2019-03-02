@@ -2,9 +2,6 @@ import logging
 import math
 from typing import Tuple, List, Optional
 
-import instance
-from backend import IBackend, RuntimeFailure
-
 FORMAT = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 
 Point = Tuple[int, int]
@@ -22,7 +19,7 @@ def get_logger(name: str, level=logging.INFO):
     return logger
 
 
-def transform_path(inst: instance.Instance, starting_point: Tuple[int, int], path: list):
+def transform_path(inst, starting_point: Tuple[int, int], path: list):
     if starting_point[0] == inst.x_min and starting_point[1] == inst.x_min:
         transformed_path = path
     elif starting_point[0] == inst.x_max and starting_point[1] == inst.y_max:
@@ -75,75 +72,6 @@ def find_waste_index(items: List[dict], waste_type: str):
             return i
 
     return -1
-
-
-def dump(inst: instance.Instance):
-    """
-    dump waste in the appropriate bin
-
-    :param bkend: instance of the backend
-    :param inst: instance of the current state
-    :param current_location: tuple with coordinates for current location
-    :return: None
-    """
-    organic_bin_loc = inst.bin_location_organic
-    recycle_bin_loc = inst.bin_location_recycle
-    garbage_bin_loc = inst.bin_location_garbage
-
-    organic_bin_cap = inst.capacity_organic
-    recycle_bin_cap = inst.capacity_recycle
-    garbage_bin_cap = inst.capacity_garbage
-
-    items_held = inst.items_held
-
-    while items_held:
-        dumped_organic = 0
-        dumped_recycle = 0
-        dumped_garbage = 0
-
-        inst.move_to_point(organic_bin_loc)
-        while dumped_organic <= organic_bin_cap:
-            waste_index = find_waste_index(items_held, 'ORGANIC')
-
-            if waste_index == -1:
-                break
-
-            try:
-                inst.unload(waste_index)
-                dumped_organic += 1
-            except RuntimeFailure as e:
-                print(e)
-                break
-
-
-        inst.move_to_point(recycle_bin_loc)
-        while dumped_recycle <= recycle_bin_cap:
-            waste_index = find_waste_index(items_held, 'RECYCLE')
-
-            if waste_index == -1:
-                break
-
-            try:
-                inst.unload(waste_index)
-                dumped_recycle += 1
-            except RuntimeFailure as e:
-                print(e)
-                break
-
-        inst.move_to_point(garbage_bin_loc)
-        while dumped_garbage <= garbage_bin_cap:
-            waste_index = find_waste_index(items_held, 'GARBAGE')
-
-            if waste_index == -1:
-                break
-
-            try:
-                inst.unload(waste_index)
-                dumped_garbage += 1
-            except RuntimeFailure as e:
-                print(e)
-                break
-
 
 def clip_coord(x, y, max_x, max_y):
     """

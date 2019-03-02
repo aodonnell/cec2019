@@ -1,4 +1,5 @@
 import abc
+import json
 
 import requests
 
@@ -7,6 +8,7 @@ import utils
 LOG = utils.get_logger(__file__)
 BASE = 'http://cec2019.ca'
 API_TOKEN = 'brunswick-8Nq9JsYFUtFzdReih3P8s2YMQiRQHDRMkWNkASN5A8xMGa4yzq5njUv4hFEEaBbZ'
+PATH = '/tmp/instance.json'
 
 
 # noinspection PyShadowingBuiltins
@@ -51,6 +53,7 @@ class IBackend(abc.ABC):
 class RuntimeFailure(RuntimeError):
     pass
 
+
 def request(method, url):
     """
     Request Wrappers for Attaching API Token
@@ -59,10 +62,12 @@ def request(method, url):
     :param url: The url.
     :return: The response.
     """
+    # print(f'{method} -> {url}')
     res = requests.request(method, BASE + url, headers={'token': API_TOKEN})
     body = res.json()
 
     t = body['type']
+    # print(f'\r{method} -> {t}')
     if t == 'ERROR':
         raise RuntimeError(body['message'])
 
@@ -71,6 +76,10 @@ def request(method, url):
 
     if t != 'SUCCESS':
         raise RuntimeError(f'Unknown type: {t}')
+
+    if body['payload'] is not None:
+        with open(PATH, 'w') as fp:
+            json.dump(body['payload'], fp)
 
     return body['payload']
 
@@ -118,7 +127,7 @@ class Backend(IBackend):
     
     Direction must be one of N, S, E or W.
     """
-    def turn(self, direction):
+    def turn(self, direction: str):
         return post('/turn/' + direction)
 
     """
@@ -136,11 +145,11 @@ class Backend(IBackend):
     """
     Collects an item previously scanned. Must be located on the item.
     """
-    def collect_item(self, id):
-        return post('/collectItem/' + id)
+    def collect_item(self, id: int):
+        return post('/collectItem/' + str(id))
 
     """
     Unloads the item when the robot is at the the proper disposal bin.
     """
-    def unload_item(self, id):
-        return post('/unloadItem/' + id)
+    def unload_item(self, id: int):
+        return post('/unloadItem/' + str(id))
