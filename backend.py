@@ -48,6 +48,9 @@ class IBackend(abc.ABC):
         pass
 
 
+class RuntimeFailure(RuntimeError):
+    pass
+
 def request(method, url):
     """
     Request Wrappers for Attaching API Token
@@ -66,7 +69,7 @@ def request(method, url):
         raise RuntimeError(body['message'])
 
     if t == 'FAILURE':
-        raise RuntimeError(body['message'])
+        raise RuntimeFailure(body['message'])
 
     if t != 'SUCCESS':
         raise RuntimeError(f'Unknown type: {t}')

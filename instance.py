@@ -120,19 +120,17 @@ class Instance:
         self.direction = direction
         self.time_spent += self.time_turn
 
-    def unload(self, i: int):
-        item = self.items_held[i]
+    def unload(self, item: dict, i: int):
         self.back.unload_item(item['id'])
         self.time_spent += self.time_unload
-        self.items_held.pop(i)
 
         t = item['type']
         if t == 'ORGANIC':
-            self.held_count_organic -= 1
+            self.held_organic.pop(i)
         elif t == 'RECYCLE':
-            self.held_count_recycle -= 1
-        elif t == 'RECYCLE':
-            self.held_count_recycle -= 1
+            self.held_recycle.pop(i)
+        elif t == 'GARBAGE':
+            self.held_garbage.pop(i)
         else:
             raise RuntimeError(f'Unknown type: {t}')
 

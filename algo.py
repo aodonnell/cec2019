@@ -2,6 +2,7 @@ from typing import List
 
 import utils
 import instance
+from backend import RuntimeFailure
 
 LOG = utils.get_logger(__file__)
 
@@ -10,12 +11,14 @@ def algo(inst: instance.Instance):
     # get all possible points
     points = inst.all_points
 
-    for point in points:
+    for point in points[:10]:
         LOG.info(f'Moving to {point} from {inst.current_point}')
         inst.move_to_point(point)
         inst.scan()
 
         search(inst, point)
+
+    dump(inst)
 
 
 def _filter_no_items(inst: instance.Instance, points: List[utils.Point]):
@@ -59,54 +62,28 @@ def search(inst: instance.Instance, point: utils.Point):
     search(inst, closest)
 
 
-def dump(inst):
+def dump(inst: instance.Instance):
     """
-    dump waste in the appropriate bin
+    Dump waste in the appropriate bin
 
-    :param inst:
-    :return:
+    :param inst: instance of the current state
     """
-    organic_bin_loc = inst.bin_location_organic
-    recycle_bin_loc = inst.bin_location_recycle
-    garbage_bin_loc = inst.bin_location_garbage
+    def unload(point: utils.Point, items: list):
+        if len(items) == 0:
+            return
 
-    organic_bin_cap = inst.capacity_organic
-    recycle_bin_cap = inst.capacity_recycle
-    garbage_bin_cap = inst.capacity_garbage
+        t = items[0]['type']
+        LOG.info(f'Moving to the {t} bin at {point}')
 
-    items_held = inst.items_held
-
-    while inst.held_organic or inst.held_recycle or inst.held_garbage:
-        dumped_organic = 0
-        dumped_recycle = 0
-        dumped_garbage = 0
-
-        inst.move_to_point(organic_bin_loc)
-        while dumped_organic <= organic_bin_cap:
-            waste_index = utils.find_waste_index(items_held, 'ORGANIC')
-
-            if waste_index == -1:
+        inst.move_to_point(point)
+        for i, item in enumerate(items):
+            try:
+                inst.unload(item, i)
+            except RuntimeFailure as e:
+                print(e)
                 break
 
-            inst.unload(waste_index)
-            dumped_organic += 1
-
-        inst.move_to_point(recycle_bin_loc)
-        while dumped_recycle <= recycle_bin_cap:
-            waste_index = utils.find_waste_index(items_held, 'RECYCLE')
-
-            if waste_index == -1:
-                break
-
-            inst.unload(waste_index)
-            dumped_recycle += 1
-
-        inst.move_to_point(garbage_bin_loc)
-        while dumped_garbage <= garbage_bin_cap:
-            waste_index = utils.find_waste_index(items_held, 'GARBAGE')
-
-            if waste_index == -1:
-                break
-
-            inst.unload(waste_index)
-            dumped_garbage += 1
+    while inst.held_garbage or inst.held_organic or inst.held_recycle:
+        unload(inst.bin_location_organic, inst.held_organic)
+        unload(inst.bin_location_recycle, inst.held_recycle)
+        unload(inst.bin_location_garbage, inst.held_garbage)

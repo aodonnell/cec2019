@@ -73,7 +73,6 @@ def find_waste_index(items: List[dict], waste_type: str):
 
     return -1
 
-
 def clip_coord(x, y, max_x, max_y):
     """
     Clip coordinate between 0 and a set maximum. return a tuple containing the coord
@@ -118,8 +117,7 @@ def get_scan_path(size_x: int, size_y: int, scan_w):
     while True:
 
         # if we're out of bounds already, go down our scan width +1 and our scan width over to the right.
-        if curr_x >= size_x or curr_x < 0 \
-                or curr_y >= size_y or curr_y < 0:
+        if curr_x >= size_x or curr_x < 0 or curr_y >= size_y or curr_y < 0:
 
             if curr_x >= (size_x - scan_w) and (curr_y >= size_y - scan_w):
                 break
