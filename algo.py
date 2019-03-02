@@ -9,7 +9,7 @@ LOG = utils.get_logger(__file__)
 
 def algo(inst: instance.Instance):
     # get all possible points
-    points = inst.all_points  # utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)  # inst.all_points
+    points = utils.get_scan_path(inst.x_size, inst.y_size, inst.radius)  # inst.all_points
 
     for i, point in enumerate(points):
         LOG.info('--------------------------------------------')
@@ -32,18 +32,18 @@ def _filter_no_items(inst: instance.Instance, points: List[utils.Point]):
 def search(inst: instance.Instance, point: utils.Point):
     # remove all that don't have any items
     points_with_items = _filter_no_items(inst, inst.all_points)
-    closest = utils.closest_point(points_with_items, point)
+    anchor = utils.closest_point(points_with_items, point)
 
     # nothing around us has any trash so lets return
-    if closest is None:
+    if anchor is None:
         LOG.info(f'No items found around {point}')
         return
 
     LOG.info(f'Found {len(points_with_items)} points with items. Starting to search.')
-    LOG.info(f'Using {closest} as anchor point')
-    point_within_radius = utils.points_around(closest, inst.radius, inst.x_size, inst.y_size)
+    LOG.info(f'Using {anchor} as anchor point')
+    point_within_radius = utils.points_around(anchor, inst.radius, inst.x_size, inst.y_size)
     point_within_radius = _filter_no_items(inst, point_within_radius)
-    current_point = closest
+    current_point = anchor
     while current_point is not None:
         LOG.info(f'Moving to {current_point}')
         inst.move_to_point(current_point)
@@ -58,12 +58,12 @@ def search(inst: instance.Instance, point: utils.Point):
         current_point = utils.closest_point(point_within_radius, current_point)
 
     # move back to the anchor position
-    LOG.info(f'Moving back to {closest} and scanning')
-    inst.move_to_point(closest)
+    LOG.info(f'Moving back to {anchor} and scanning')
+    inst.move_to_point(anchor)
     inst.scan()
 
     LOG.info('Scanning again.')
-    search(inst, closest)
+    search(inst, anchor)
 
 
 def dump(inst: instance.Instance):
